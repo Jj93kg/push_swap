@@ -355,6 +355,21 @@ void	sort_stack(stack *s, stack *p)
     
  int	main(void)
 {
+	/*if (argc < 2) 
+	{
+		printf("Print a command bruh.\n");
+		return (0);
+	}
+	stack s;
+	stack p;
+	make_empty(&s);
+	make_empty(&p);
+	int i = 0;
+	while (argc >= 2 && i < argc) 
+	{
+		push(s, argv[i]);
+		i++;
+	}*/
     stack s; // Declare an instance of stack s
     stack p;
     make_empty(&s); // Check stack empty before filling it
@@ -561,6 +576,9 @@ void	sort_stack(stack *s, stack *p)
     push(&s, 6);
     push(&s, 5);
     push(&s, 8);
+    push(&s, 10);
+    push(&s, 51);
+    push(&s, 7);
 
     printf("Unsorted stack s: \n");
     print_stack(&s);
