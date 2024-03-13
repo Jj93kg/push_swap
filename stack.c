@@ -200,12 +200,13 @@ void print_stack(const stack *s)
 {
     printf("Stack contents (top to bottom): ");
     int i = s->top - 1;
+    printf("\n");
     while (i >= 0)
     {
-        printf("%d ", s->contents[i]);
+        printf("%d\n", s->contents[i]);
         i--;
     }
-    printf("\n");
+   printf("\n");
 }
 
 int top(stack *s)
@@ -215,6 +216,24 @@ int top(stack *s)
         return (s->contents[s->top - 1]);
     }
     return (-1);
+}
+
+int find_min(stack *s)
+{
+	int	len;
+	int	min;
+
+	len = s->top;
+	min = s->contents[s->top - 1];
+	while (len >= 0) 
+	{
+		if (s->contents[len - 1] < min) 
+		{
+			min = s->contents[len - 1];
+		}
+		len--;
+	}
+	return (min);
 }
 
 int find_min_position(stack *s, int value)
@@ -229,204 +248,112 @@ int find_min_position(stack *s, int value)
     return -1; // Indicates the value was not found.
 }
 
-void movemintos(stack *s, stack *p)
+void find_movemintos(stack *s, stack *p)
 {
     if (s->top == 1) 
     {
-        printf("Only one number in stack!\n");
-        pb(p, s);
-        return ;
+	    //printf("Only one number in stack!\n");
+	    pb(p, s);
+	    printf("pb\n");
+	    return ;
     }
     int originalSize = s->top;
-    printf("Original size of stack s is %d\n", originalSize);
-    printf("Now rotating stack once.\n");
-    printf("Stack before:\n");
-    print_stack(s);
+   // printf("Original size of stack s is %d\n", originalSize);
+   // printf("Now rotating stack once.\n");
+    //printf("Stack before:\n");
+    //print_stack(s);
     rb(s);
-    printf("Stack after\n");
-    print_stack(s);
+    printf("rb\n");
+    //printf("Stack after\n");
+    //print_stack(s);
     int i = 0;
     while (i < originalSize) 
     {
         if (s->contents[s->top - 1] > s->contents[s->top - 2]) 
         {
-            printf("Top number is bigger than number below, swapping\n.");
+            //printf("Top number is bigger than number below, swapping\n.");
             sb(s);
+	    printf("sb\n");
         }
-        printf("Rotating again.\n");
+        //printf("Rotating again.\n");
         rb(s);
+	printf("rb\n");
         i++;
     }
-    printf("Pushing from s to p.\n");
+    //printf("Pushing from s to p.\n");
 pb(p, s);
+printf("pb\n");
 }
 
-void sort_stack(stack *s, stack *p)
+int	where_is_min(stack *s)
 {
-    make_empty(p);
-    printf("Conditions of stacks at beginning.\n");
-    print_stack(s);
-    print_stack(p);
-    printf("-----------------------------------------------------\n");
-    // Move All Elements to Stack p whilst finding min:
-    
-    while (!is_empty(s)) 
-    {
-        movemintos(s, p);
-    }
-
-    while (!is_empty(p)) 
-    {
-        pb(s, p);
-    }
-    printf("Attempt after new functions\n");
-    print_stack(s);
-    print_stack(p);
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    /*int numbersMoved = 0;
-    int min = INT_MAX;
-    while (!is_empty(s))
-    {
-        int current = top(s);
-        pb(p, s);
-        if (current < min)
-        {
-            min = current;
-            printf("Number min is %d\n", min);
-        }
-    }
-    //Find where in stack min is to figure out how many times to rotate
-    int position_ft = 0;
-    int z = p->top - 1;
-    while (z >= 0) 
-    {
-        if (p->contents[z] == min) 
-        {
-            break;
-        }
-        z--;
-        position_ft++;
-    }
-    printf("Position from top is %d\n", position_ft);
-
-    //Rotate min to top to push it to s
-    int y = 0;
-    while (y < position_ft) 
-    {
-        rra(p);
-        y++;
-    }
-    printf("Stack after rotating min to top is\n");
-    print_stack(p);
-    //Actually push min to stack s
-    pa(s, p);
-    printf("Stack after pushing min to s is\n");
-    print_stack(s);
-    print_stack(p);
-    
-    //TO DO:
-    // Now we have moved from stack s to p, found and moved smallest from p back to s. 
-    // Now need to go back through p, and find smallest again to move to s.
-
-    
-
-    printf("Conditions of stacks after initial move from s to p are\n");
-    print_stack(s);
-    print_stack(p);
-    printf("-----------------------------------------------------\n");
-    //Move one element back to Stack s
-        pa(s, p);
-    printf("Conditions of stacks after moving one element from s to p are\n");
-    print_stack(s);
-    print_stack(p);
-    printf("-----------------------------------------------------\n");
-        int min = s->contents[s->top - 1];
-        while (!is_empty(p))
-        {
-            pa(s, p);
-            int newElement = s->contents[s->top - 1];
-            if (min > newElement)
-            {
-                min = newElement;
-            }
-        }
-       // Re-find the smallest element's position from the top
-    int positionFromTop = 0;
-    int i = s->top - 1;
-    while (i > 0)
-    {
-        if (s->contents[i] == min)
-        {
-            break;
-        }
-        i--;
-        positionFromTop++;
-    }
-    printf("Conditions of stacks after finding smallest, it's %d.\n", min);
-    print_stack(s);
-    print_stack(p);
-    printf("-----------------------------------------------------\n");
-
-    // Apply rra positionFromTop times to bring the smallest to the top
-    printf("Conditions of stacks after moving smallest to top.\n");
-    i = 0;
-    while (i < positionFromTop)
-    {
-        rra(s);
-        i++;
-    }
-    print_stack(s);
-    print_stack(p);
-    printf("-----------------------------------------------------\n");
-    printf("Conditions of stacks after moving smallest to p stack.\n");
-    pb(p, s);
-    print_stack(s);
-    print_stack(p);
-        printf("-----------------------------------------------------\n");*/
+	int min = find_min(s);
+	int len = s->top;
+	int half = len / 2;
+	int position = find_min_position(s, min);
+	int closer = 0;
+	if (position >= half) 
+	{
+		//printf("%d\n is closer to end\n", min);
+		return (closer = 1);
+	}
+	else if (position < half) 
+	{
+		//printf("%d\n is closer to start\n", min);
+		return (closer);
+	}
 }
 
-void sort_stack2(stack *s, stack *p)
+void	sort_nums(stack *s, stack *p, int min, int position)
 {
-    make_empty(p); // Assuming you have a function like this to initialize a stack.
-
-    while (!is_empty(s))
-    { // Continue until s is empty.
-        int temp = pop(s);
-
-        // Move elements from p back to s if they are greater than temp.
-        while (!is_empty(p) && p->contents[p->top - 1] > temp)
-        {
-            push(s, pop(p));
-        }
-
-        // Correct place for temp in p.
-        push(p, temp);
-    }
-
-    // Now, p contains the sorted elements. If you need them back in s, reverse the process.
-    while (!is_empty(p))
-    {
-        push(s, pop(p));
-    }
+	if (position == 1) 
+	{
+		while (s->contents[s->top - 1] != min) 
+		{
+			ra(s);
+		}
+	}
+	else if (position == 0) 
+	{
+		while (s->contents[s->top - 1] != min) 
+		{
+			rra(s);
+		}
+	}
 }
 
-int main(void)
+void	sort_stack(stack *s, stack *p)
+{
+	int	len;
+	int	half;
+	int	min;
+
+	while (!is_empty(s)) 
+	{
+		len = s->top;
+		half = len / 2;
+		//print_stack(s);
+		////print_stack(p);
+		////printf("Length is %d\n", len);
+		////printf("Half is %d\n", half);
+		min = find_min(s);
+		////printf("Min in stack s is %d\n", min);
+		int closer = where_is_min(s);
+		//printf("%d is rank %d which means it worked\n", min, closer);
+		sort_nums(s, p, min, closer);
+		pb(p, s);
+		printf("pb\n");
+		int y = p->top - 1;
+		//printf("Number at top should be %d which is %d\n", min, p->contents[y]);
+	}
+	//print_stack(p);
+	while (!is_empty(p)) 
+	{
+		pb(s, p);
+	}
+}
+    
+ int	main(void)
 {
     stack s; // Declare an instance of stack s
     stack p;
@@ -628,18 +555,19 @@ int main(void)
 
     // printf("Now making them randomly assigned.\n");
 
-    push(&s, 4);
+    push(&s, 2);
     push(&s, 1);
     push(&s, 3);
+    push(&s, 6);
     push(&s, 5);
-    push(&s, 2);
+    push(&s, 8);
 
-    // printf("Unsorted stack s: \n");
-    // print_stack(&s);
+    printf("Unsorted stack s: \n");
+    print_stack(&s);
     sort_stack(&s, &p);
 
-    // printf("Sorted stacks:\n");
-    // print_stack(&s);
-    // print_stack(&p);
+    printf("Sorted stacks:\n");
+    print_stack(&s);
+    print_stack(&p);
     return (0);
 }
