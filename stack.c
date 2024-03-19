@@ -190,6 +190,19 @@ void rrs(stack *s, stack *p)
     rrb(p);
 }
 
+void print_stack(const stack *a)
+{
+    printf("Stack contents (top to bottom): ");
+    int i = a->top - 1;
+    printf("\n");
+    while (i >= 0)
+    {
+        printf("%d\n", a->contents[i]);
+        i--;
+    }
+    printf("\n");
+}
+
 int *CMS_array(stack *s)
 {
     int len = s->top;
@@ -253,6 +266,7 @@ int partition_BOM(stack *a, stack *b, int mid)
     {
         if (top(a) < mid)
         {
+		//printf("Number %d is less than mid number which is %d\n", a->contents[a->top - 1], mid);
             pb(b, a);
             moved++;
         }
@@ -265,6 +279,33 @@ int partition_BOM(stack *a, stack *b, int mid)
     return (moved);
 }
 
+int	num_in_stack(stack *s)
+{
+	int i = 0;
+	while (i < s->top) 
+	{
+		i++;
+	}
+	return (i);
+}
+
+void sortTwo(stack *a)
+{
+	  int top = a->contents[a->top - 1];
+    int middle = a->contents[a->top - 2];
+
+	// Case for 2 numbers
+    if (top < middle)
+    {
+            return ;
+    }
+
+    else if (top > middle)
+    {
+            sa(a);
+    }
+}
+
 void sortThree(stack *a) 
 {
     // Assuming top of the stack is the last element in the array representation
@@ -274,11 +315,12 @@ void sortThree(stack *a)
     int move = 0;
 
     // Case 1
-    if (top > middle && top < bottom && middle < bottom) 
+    if (top > middle && top > bottom && middle < bottom) 
     {
-        sa(a);
-        printf("sa\n");
-        move++;
+        rra(a);
+	sa(a);
+	ra(a);
+	move += 3;
     }
 
     //Case 2
@@ -302,21 +344,24 @@ void sortThree(stack *a)
     //Case 4
     else if (top < middle && top < bottom && middle > bottom) 
     {
-        sa(a);
-        ra(a);
-        printf("sa\n");
-        printf("ra\n");
-        move +=2;
+	    rra(a);
+	    move ++;
     }
 
     //Case 5
     else if (top < middle && top > bottom && middle > bottom) 
     {
-        rra(a);
+        sa(a);
         printf("rra\n");
         move++;
     }
 
+    else if (top < middle && top < bottom && middle < bottom)
+    {
+            rra(a);
+	    sa(a);
+	    move+=2;
+    }
     else 
     {
         return ;
@@ -324,83 +369,91 @@ void sortThree(stack *a)
     printf("Moves taken: %d\n", move);
 }
 
-// Assuming sortThree and other stack operations are already defined
-
 // Function to analyze stack and partition based on midpoint
 void sortAndPartition(stack *a, stack *b) 
 {
     int size = a->top;
-    int *arr = CMS_array(a); // Combine create & sort array into one function
+    //printf("size is %d\n", size);
+    int *arr = CMS_array(a);
+    int z = 0;
+    /*while (z < size) 
+    {
+	    printf("%d ", arr[z]);
+	    z++;
+    }*/
     int mid = find_midpoint(arr, size);
-    
-    // Free array if you're done with it
+    //printf("Mid point is %d\n", mid);
     free(arr);
     
-    // Partition elements below the midpoint to B
-    partition_BOM(a, b, mid);
-    
-    // If A has 3 elements left, sort them
-    if (a->top <= 3) 
+    // Partition elements below midpoint to B
+    int moved = partition_BOM(a, b, mid);
+    printf("After partitioning, here are stacks.\n");
+    //printf("And %d moved to stack b.\n", moved);
+    print_stack(a);
+    print_stack(b);
+    int left = num_in_stack(a);
+    //printf("%d Numbers left in a\n", left);
+
+    // If A has 3 or less elements left, sort
+    if (left <= 3) 
     {
         sortThree(a);
     }
+    if (moved == 2) 
+    {
+	    sortTwo(b);
+    }
+    printf("Stacks a and b after sorting.\n");
+    print_stack(a);
+    print_stack(b);
 
     int biggest = top(a);
-    
+    printf("Biggest is %d\n", biggest);
     while (!is_empty(b)) 
     {
-        pa(a, b);
-        printf("pa\n");
+	    pa(a, b);
     }
-
-    while (top(a) != biggest) 
+    printf("Stacks a and b after moving.\n");
+    print_stack(a);
+    print_stack(b);
+    while (1) 
     {
-        rra(a);
-        printf("rra\n");
+	    if (top(a) == biggest) 
+	    {
+		    printf("Success! %d does equal %d\n", top(a), biggest);
+		    printf("Stack now in order.\n");
+		    print_stack(a);
+		    break ;
+	    }
+	    else 
+	    {
+		    printf("%d doesn't equal %d, rotating\n", top(a), biggest);
+		    rra(a);
+	    }
     }
+}
   
-        /*ra(a);
-        printf("ra\n");
-        ra(a);
-        printf("ra\n");
-    }*/
-    // Additional logic to handle elements in B and possibly move them back to A
-}
-
-void print_stack(const stack *a)
-{
-    printf("Stack contents (top to bottom): ");
-    int i = a->top - 1;
-    printf("\n");
-    while (i >= 0)
-    {
-        printf("%d\n", a->contents[i]);
-        i--;
-    }
-    printf("\n");
-}
-
-int main(void)
+   int main(void)
 {
     stack a;
     stack b;
     make_empty(&a);
     make_empty(&b);
 
-    push(&a, 4);
-    push(&a, 5);
-    push(&a, 1);
-    push(&a, 3);
-    push(&a, 2);
+    push(&a, 16);
+    push(&a, 23);
+    push(&a, 17);
+    push(&a, 18);
+    push(&a, 21);
     
-    printf("Before\n");
-    print_stack(&a);
+    //printf("Before\n");
+    //print_stack(&a);
 
     sortAndPartition(&a, &b);
 
-    printf("After\n");
-    print_stack(&a);
-    print_stack(&b);
+    //printf("After\n");
+    //print_stack(&a);
+    //print_stack(&b);
     return (0);
 }
 
