@@ -1,7 +1,11 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
 #include "stack.h"
+
+void sortTwo(stack *a);
+void sortThree(stack *a);
 
 void make_empty(stack *s)
 {
@@ -262,20 +266,58 @@ int partition_BOM(stack *a, stack *b, int mid)
     int moved = 0;
     int size = a->top;
     int i = 0;
+    int biggest = 0;
+    int hugest = 0;
     while (i < size)
     {
         if (top(a) < mid)
         {
-		//printf("Number %d is less than mid number which is %d\n", a->contents[a->top - 1], mid);
             pb(b, a);
-            moved++;
+	    printf("pb\n");
+	    moved++;
+	    if (top(b) < biggest) 
+	    {
+		    printf("New kid %d is not as big as the resident big boy who is %d\n", top(b), biggest);
+		    printf("Despite new kid, resident big boy should still be %d and it is %d\n", biggest, top(b));
+		    print_stack(b);
+		    
+	    } 
         }
         else if (top(a) >= mid)
         {
-            ra(a);
+		ra(a);
+		printf("ra\n");
+		moved++;
         }
         i++;
     }
+    printf("Stacks after partitioning to a and b and sorting b\n");
+    print_stack(a);
+    print_stack(b);
+    while (!is_empty(a) && a->top != 3) 
+    {
+	    pb(b, a);
+	    printf("pb\n");
+	    moved++;
+    }
+    printf("Stacks after moving unsorted a to sorted b\n");
+    print_stack(a);
+    print_stack(b);
+
+    sortThree(a);
+    printf("Stacks after sorting what's left in stack a and rest in b\n");
+    print_stack(a);
+    print_stack(b);
+
+    while (!is_empty(a)) 
+    {
+	    pb(b, a);
+	    printf("pb\n");
+	    moved++;
+    }
+    printf("Stacks after moving sorted 3 elements a to stack b\n");
+    print_stack(a);
+    print_stack(b);
     return (moved);
 }
 
@@ -314,17 +356,78 @@ void sortThree(stack *a)
     int bottom = a->contents[a->top - 3];
     int move = 0;
 
+    //Case 2
+    if (top < middle && top < bottom && middle > bottom) 
+    {
+	    ra(a);
+	    printf("ra\n");
+	    sa(a);
+	    printf("sa\n");
+	    move += 2;
+    }
+
+    //Case 3
+    else if (top > middle && top < bottom && middle < bottom) 
+    {
+	    sa(a);
+	    printf("sa\n");
+	    move++;
+    }
+
+    //Case 4
+    else if (top > middle && top > bottom && middle > bottom) 
+    {
+	    rra(a);
+	    printf("rra\n");
+	    sa(a);
+	    printf("sa\n");
+	    move+=2;
+    }
+
+    //Case 5
+    else if (top < middle && top > bottom && middle > bottom) 
+    {
+        ra(a);
+	printf("ra\n");
+        move++;
+    }
+    
+    // Case 6
+    else if (top > middle && top > bottom && middle < bottom)
+    {
+            rra(a);
+	    printf("rra\n");
+	    move++;
+    }
+    
+    //Case 1
+    else 
+    {
+	    printf("Moves taken to sort stack: %d\n", move);
+        return ;
+    }
+    printf("Moves taken to sort stack: %d\n", move);
+}
+
+/*void sortThree(stack *a)
+{
+    // Assuming top of the stack is the last element in the array representation
+    int top = a->contents[a->top - 1];
+    int middle = a->contents[a->top - 2];
+    int bottom = a->contents[a->top - 3];
+    int move = 0;
+
     // Case 1
-    if (top > middle && top > bottom && middle < bottom) 
+    if (top > middle && top > bottom && middle < bottom)
     {
         rra(a);
-	sa(a);
-	ra(a);
-	move += 3;
+        sa(a);
+        ra(a);
+        move += 3;
     }
 
     //Case 2
-    else if (top > middle && top > bottom && middle < bottom) 
+    else if (top > middle && top > bottom && middle < bottom)
     {
         sa(a);
         rra(a);
@@ -334,7 +437,7 @@ void sortThree(stack *a)
     }
 
     //Case 3
-    else if (top > middle && top > bottom && middle < bottom) 
+    else if (top > middle && top > bottom && middle < bottom)
     {
         ra(a);
         printf("ra\n");
@@ -342,14 +445,14 @@ void sortThree(stack *a)
     }
 
     //Case 4
-    else if (top < middle && top < bottom && middle > bottom) 
+    else if (top < middle && top < bottom && middle > bottom)
     {
-	    rra(a);
-	    move ++;
+            rra(a);
+            move ++;
     }
 
     //Case 5
-    else if (top < middle && top > bottom && middle > bottom) 
+    else if (top < middle && top > bottom && middle > bottom)
     {
         sa(a);
         printf("rra\n");
@@ -359,43 +462,40 @@ void sortThree(stack *a)
     else if (top < middle && top < bottom && middle < bottom)
     {
             rra(a);
-	    sa(a);
-	    move+=2;
+            sa(a);
+            move+=2;
     }
-    else 
+    else
     {
         return ;
     }
     printf("Moves taken: %d\n", move);
-}
+}*/
+
 
 // Function to analyze stack and partition based on midpoint
-void sortAndPartition(stack *a, stack *b) 
+/*void sortAndPartition(stack *a, stack *b) 
 {
     int size = a->top;
     //printf("size is %d\n", size);
     int *arr = CMS_array(a);
     int z = 0;
-    /*while (z < size) 
+    while (z < size) 
     {
 	    printf("%d ", arr[z]);
 	    z++;
-    }*/
+    }
     int mid = find_midpoint(arr, size);
-    //printf("Mid point is %d\n", mid);
     free(arr);
     
-    // Partition elements below midpoint to B
     int moved = partition_BOM(a, b, mid);
-    printf("After partitioning, here are stacks.\n");
-    //printf("And %d moved to stack b.\n", moved);
+    int left = num_in_stack(a);
     print_stack(a);
     print_stack(b);
-    int left = num_in_stack(a);
-    //printf("%d Numbers left in a\n", left);
+
 
     // If A has 3 or less elements left, sort
-    if (left <= 3) 
+    if (left == 3) 
     {
         sortThree(a);
     }
@@ -431,25 +531,67 @@ void sortAndPartition(stack *a, stack *b)
 		    rra(a);
 	    }
     }
-}
+}*/
   
    int main(void)
 {
+	/*if (argc < 2) 
+	{
+		printf("You suck!\n");
+		return (0);
+	}*/
     stack a;
     stack b;
     make_empty(&a);
     make_empty(&b);
 
-    push(&a, 16);
-    push(&a, 23);
-    push(&a, 17);
-    push(&a, 18);
-    push(&a, 21);
-    
-    //printf("Before\n");
-    //print_stack(&a);
+     push(&a,3);
+    push(&a, 5);
+    push(&a, 1);
+    push(&a, 2);
+    push(&a, 8);
+    push(&a, 6);
 
-    sortAndPartition(&a, &b);
+	printf("Stacks before are ");
+	print_stack(&a);
+
+    int *array = CMS_array(&a);
+    int i = 0;
+    int len = a.top;
+    printf("Array elements are ");
+    while (i < len) 
+    {
+	    printf("%d ", array[i]);
+	    i++;
+    }
+    printf("\n");
+
+    int mid = find_midpoint(array, len);
+    printf("Midpoint chosen is %d\n", mid);
+    int result = partition_BOM(&a, &b, mid);
+    printf("Took %d moves to move during partitioning\n", result);
+    //printf("Now stacks after partitioning\n");
+    //print_stack(&a);
+    //print_stack(&b);
+
+    /*int i = 0;
+    int num = 0;
+    while (i < argc) 
+    {
+	    if (argv[1][i] >= '0' && argv[1][i] <= '9') 
+	    {
+		    num = argv[1][i] - '0';
+		    push(&a, num);
+	    }
+	    i++;
+    }*/
+    
+    //push(&a, 57);
+    //push(&a, 89);
+    //push(&a, 94);
+    
+
+    //sortAndPartition(&a, &b);
 
     //printf("After\n");
     //print_stack(&a);
